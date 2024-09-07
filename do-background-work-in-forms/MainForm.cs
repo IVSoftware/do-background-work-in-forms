@@ -92,9 +92,9 @@ namespace do_background_work_in_forms
         enum Stage { Idle, Stage1, Stage2, Stage3 }
         private async Task RunBackgroundWorkInStages()
         {
-            UpdateMainForm(enableButton: true, label: $@"{Stage.Idle}");
             try
             {
+                UpdateMainForm(enableButton: true, label: $@"{Stage.Idle}");
                 using (var notification = new Notification())
                 {
                     var stopwatchTotal = Stopwatch.StartNew();
