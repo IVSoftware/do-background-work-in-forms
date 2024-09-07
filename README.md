@@ -88,10 +88,11 @@ public partial class Notification : Form
     [Obsolete("Use ShowAsync with this class")]
     public new void Show(IWin32Window owner) => throw new NotImplementedException();
 
+    
     [Obsolete("Use ShowDialog(owner, message, ok, cancel), with this class")]
     public new void ShowDialog() => throw new NotImplementedException();
 
-    [Obsolete("Use ShowDialog(owner, message, ok, cancel) with this class")]
+    [Obsolete("Use ShowDialog(owner, message, ok, cancel), with this class")]
     public new void ShowDialog(IWin32Window owner) => throw new NotImplementedException();
 }
 ```
@@ -213,32 +214,37 @@ ___
 ##### ShowDialog Notification _after_ work is complete ('not' the question as worded)
 
 ```
-enum Stage { Idle, Stage1, Stage2, Stage3 }
-private async Task RunBackgroundWorkInStages()
+public MainForm()
 {
-    using (var notification = new Notification())
+    InitializeComponent();
+    buttonStartWorkload.Click += async (sender, e) =>
+        // Simulate workload with delay
+        await NotifyWhenComplete(
+            work: () => 
+            Task
+            .Delay(TimeSpan.FromSeconds(10))
+            .Wait(),
+            true
+            );
+}
+private async Task NotifyWhenComplete(Action work, bool notify)
+{
+    try
     {
-        label.BeginInvoke(() => label.Text = $@"{Stage.Idle}");
-        var stopwatchTotal = Stopwatch.StartNew();
-        foreach (Stage stage in Enum.GetValues<Stage>().Skip(1))
+        UpdateMainForm(enableButton: false, label: $@"{DateTime.Now:hh\:mm\:ss}");
+        await Task.Run(work);
+        if (notify) using (var notifier = new Notification())
         {
-            var stopwatchTask = Stopwatch.StartNew();
-            label.BeginInvoke(() => label.Text = $@"{stage}");
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            stopwatchTask.Stop();
-            await notification.ShowAsync(
-                        this,
-                        $"Performed {stage} in {(int)stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
-                        $"Total time is {(int)stopwatchTotal.Elapsed.TotalSeconds} seconds",
-                        ok: "Continue",
-                        cancel: "Cancel");
-            if (notification.DialogResult == DialogResult.Cancel) break;
+            notifier.ShowDialog(this, "Backgound work is complete.", cancel: "Close");
         }
     }
-    label.BeginInvoke(() => label.Text = $@"{Stage.Idle}");
+    finally
+    {
+        UpdateMainForm(enableButton: true, label: $@"{DateTime.Now:hh\:mm\:ss}");
+    }
 }
 ```
 
 
-  [1]: https://i.sstatic.net/lGUMIcu9.png
+  [1]: https://i.sstatic.net/WzfB3awX.png
   [2]: https://i.sstatic.net/QsJDT1Wn.png
