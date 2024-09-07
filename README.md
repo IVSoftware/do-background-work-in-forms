@@ -130,7 +130,7 @@ private async Task RunClockWithReminders()
                     // Discard/Ignore the return task in this case
                     _ = notification.ShowAsync(
                         this,
-                        $"Performed {stopwatch.Elapsed.Seconds} seconds total work.",
+                        $"Performed {stopwatch.Elapsed.TotalSeconds} seconds total work.",
                         ok: "Snooze",
                         cancel: "Dismiss");
                 }
@@ -161,7 +161,7 @@ private void UpdateMainForm(bool enableButton, string? label = null, string? tit
 ___
 
 
-##### Notify on background progress, but block background work pending Continue/Cancel (Work in Stages Example)
+##### Notify on stage, blocking background work pending Continue/Cancel (Work in Stages Example)
 
 Here the goal is to inform user that a portion of the work has completed before continuing to do more background work. The total elapsed time of the background task can be >> the total of the task stages in this case. There may be a temptation to `ShowDialog()` to keep the background from doing any more work until user confirms it, but don't do that.
 
@@ -191,8 +191,8 @@ private async Task RunBackgroundWorkInStages()
                 stopwatchTask.Stop();
                 await notification.ShowAsync(
                     this,
-                    $"Performed {stage} in {stopwatchTask.Elapsed.Seconds} seconds.{Environment.NewLine}" +
-                    $"Total time is {stopwatchTotal.Elapsed.Seconds} seconds",
+                    $"Performed {stage} in {stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
+                    $"Total time is {stopwatchTotal.Elapsed.TotalSeconds} seconds",
                     ok: "Continue",
                     cancel: "Cancel");
                 if (notification.DialogResult == DialogResult.Cancel) break;
@@ -225,8 +225,8 @@ private async Task RunBackgroundWorkInStages()
             stopwatchTask.Stop();
             await notification.ShowAsync(
                         this,
-                        $"Performed {stage} in {stopwatchTask.Elapsed.Seconds} seconds.{Environment.NewLine}" +
-                        $"Total time is {stopwatchTotal.Elapsed.Seconds} seconds",
+                        $"Performed {stage} in {stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
+                        $"Total time is {stopwatchTotal.Elapsed.TotalSeconds} seconds",
                         ok: "Continue",
                         cancel: "Cancel");
             if (notification.DialogResult == DialogResult.Cancel) break;
