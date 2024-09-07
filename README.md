@@ -1,4 +1,4 @@
-Your question is about showing a notification form on to _during_ backgound work (emphasis mine on _during_). That is, if you only want to do background work and pop up a modal or non-modal notification when it's done, just await the Task and show the notification when you get execution back. I'd like to attempt to answer the question as worded, and there's a subtle distinction to be made here. It seems to me there are at least two variations: a notification that allows the background work to keep running (Snooze/Dismiss Clock Runner example), and one that blocks the _background_ work, but not the UI (Continue/Cancel Work in Stages Example. So one might consider implementing the notification `Form` in a manner that can optionally await a `DialogResult` when shown as a non-modal, and also stays on top of the parent form as per the spec.
+Your question is about showing a notification form on to _during_ backgound work (emphasis mine on _during_). That is, if you only want to do background work and pop up a modal or non-modal notification when it's done, just await the Task and show the notification when you get execution back. I'd like to attempt to answer the question as worded, and there's a subtle distinction to be made here. It seems to me there are at least two variations: a notification that allows the background work to keep running (Snooze/Dismiss Clock Runner example), and one that blocks the _background_ work, but not the UI (Continue/Cancel Work in Stages Example. So one might consider implementing the notification `Form` in a manner that can optionally `await` a `DialogResult` when shown as a non-modal, and also stays on top of the parent form as per the spec.
 
 #### Custom notification form
 ```
@@ -139,17 +139,15 @@ private async Task RunClockWithReminders()
         UpdateMainForm(enableButton: true);
     }
 }
-private void UpdateMainForm(bool enableButton, string? label = null, string? title = "")
+private void UpdateMainForm(bool enableButton, string? label = null, bool copyToTitle = true)
 {
     BeginInvoke(() =>
     {
         buttonStartWorkload.Enabled = enableButton;
-        if (label is string) this.label.Text = label;
-        if (title is string)
+        if (label is string)
         {
-            // Specifically, on empty, copy label to Title
-            if (title == string.Empty) Text = this.label.Text;
-            else Text = title;
+            this.label.Text = label;
+            if (copyToTitle) Text = label;
         }
     });
 }
@@ -162,6 +160,8 @@ ___
 
 Here the goal is to inform user that a portion of the work has completed before continuing to do more background work. The total elapsed time of the background task can be >> the total of the task stages in this case. There may be a temptation to `ShowDialog()` to keep the background from doing any more work until user confirms it, but don't do that.
 
+[![background work in stages][2]][2]
+
 ```
 public MainForm()
 {
@@ -172,26 +172,33 @@ public MainForm()
 enum Stage { Idle, Stage1, Stage2, Stage3 }
 private async Task RunBackgroundWorkInStages()
 {
-    using (var notification = new Notification())
+    UpdateMainForm(enableButton: true, label: $@"{Stage.Idle}");
+    try
     {
-        label.BeginInvoke(() => label.Text = $@"{Stage.Idle}");
-        var stopwatchTotal = Stopwatch.StartNew();
-        foreach (Stage stage in Enum.GetValues<Stage>().Skip(1))
+        using (var notification = new Notification())
         {
-            var stopwatchTask = Stopwatch.StartNew();
-            label.BeginInvoke(() => label.Text = $@"{stage}");
-            await Task.Delay(TimeSpan.FromSeconds(10));
-            stopwatchTask.Stop();
-            await notification.ShowAsync(
-                        this,
-                        $"Performed {stage} in {stopwatchTask.Elapsed.Seconds} seconds.{Environment.NewLine}" +
-                        $"Total time is {stopwatchTotal.Elapsed.Seconds} seconds",
-                        ok: "Continue",
-                        cancel: "Cancel");
-            if (notification.DialogResult == DialogResult.Cancel) break;
+            var stopwatchTotal = Stopwatch.StartNew();
+            foreach (Stage stage in Enum.GetValues<Stage>().Skip(1))
+            {
+                var stopwatchTask = Stopwatch.StartNew();
+                UpdateMainForm(enableButton: false, label: $@"{stage}", title: $"{DateTime.Now:hh\\:mm\\:ss} {stage}");
+                await Task.Delay(TimeSpan.FromSeconds(10));
+                UpdateMainForm(enableButton: false, label: $@"{stage}", title: $"{DateTime.Now:hh\\:mm\\:ss} {stage}");
+                stopwatchTask.Stop();
+                await notification.ShowAsync(
+                    this,
+                    $"Performed {stage} in {stopwatchTask.Elapsed.Seconds} seconds.{Environment.NewLine}" +
+                    $"Total time is {stopwatchTotal.Elapsed.Seconds} seconds",
+                    ok: "Continue",
+                    cancel: "Cancel");
+                if (notification.DialogResult == DialogResult.Cancel) break;
+            }
         }
     }
-    label.BeginInvoke(() => label.Text = $@"{Stage.Idle}");
+    finally
+    {
+        UpdateMainForm(enableButton: true, label: $@"{Stage.Idle}");
+    }
 }
 ```
 
@@ -225,4 +232,5 @@ private async Task RunBackgroundWorkInStages()
 ```
 
 
-  [1]: https://i.sstatic.net/lQsjoKD9.png
+  [1]: https://i.sstatic.net/lGUMIcu9.png
+  [2]: https://i.sstatic.net/YF7s8Xsx.png
