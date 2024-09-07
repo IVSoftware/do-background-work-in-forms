@@ -32,7 +32,11 @@
         }
 
         SemaphoreSlim _busy = new SemaphoreSlim(1, maxCount: 1);
-        public async Task ThreadsafeShowWithMessageAsync(
+
+        /// <summary>
+        /// Alternative to `Show` that is awaitable.
+        /// </summary>
+        public async Task ShowAsync(
                 Control owner, 
                 string message,
                 string? ok = null,
@@ -71,16 +75,16 @@
             buttonCancel.Text = cancel ?? "Cancel";
             textBoxMessage.Text = message ?? string.Empty;
         }
-        [Obsolete("Use ThreadsafeShowWithMessageAsync with this class")]
+        [Obsolete("Use ShowAsync with this class")]
         public new void Show() => throw new NotImplementedException();
     
-        [Obsolete("Use ThreadsafeShowWithMessageAsync with this class")]
+        [Obsolete("Use ShowAsync with this class")]
         public new void Show(IWin32Window owner) => throw new NotImplementedException();
 
-        [Obsolete("Use ThreadsafeShowWithMessageAsync with this class")]
+        [Obsolete("Use ShowAsync with this class")]
         public new void ShowDialog() => throw new NotImplementedException();
 
-        [Obsolete("Use ThreadsafeShowWithMessageAsync with this class")]
+        [Obsolete("Use ShowAsync with this class")]
         public new void ShowDialog(IWin32Window owner) => throw new NotImplementedException();
     }
 }

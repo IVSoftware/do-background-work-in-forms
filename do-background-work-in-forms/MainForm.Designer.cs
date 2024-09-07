@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             buttonStartWorkload = new Button();
-            labelClock = new Label();
+            label = new Label();
             SuspendLayout();
             // 
             // buttonStartWorkload
@@ -41,24 +41,24 @@
             buttonStartWorkload.Text = "Start Workload";
             buttonStartWorkload.UseVisualStyleBackColor = true;
             // 
-            // labelClock
+            // label
             // 
-            labelClock.BackColor = Color.WhiteSmoke;
-            labelClock.BorderStyle = BorderStyle.FixedSingle;
-            labelClock.Font = new Font("Segoe UI", 20F);
-            labelClock.Location = new Point(135, 23);
-            labelClock.Name = "labelClock";
-            labelClock.Size = new Size(179, 72);
-            labelClock.TabIndex = 1;
-            labelClock.Text = "00:00:00";
-            labelClock.TextAlign = ContentAlignment.MiddleCenter;
+            label.BackColor = Color.WhiteSmoke;
+            label.BorderStyle = BorderStyle.FixedSingle;
+            label.Font = new Font("Segoe UI", 20F);
+            label.Location = new Point(135, 23);
+            label.Name = "label";
+            label.Size = new Size(179, 72);
+            label.TabIndex = 1;
+            label.Text = "00:00:00";
+            label.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(478, 244);
-            Controls.Add(labelClock);
+            Controls.Add(label);
             Controls.Add(buttonStartWorkload);
             Name = "MainForm";
             Text = "Main Form";
@@ -68,6 +68,6 @@
         #endregion
 
         private Button buttonStartWorkload;
-        private Label labelClock;
+        private Label label;
     }
 }
