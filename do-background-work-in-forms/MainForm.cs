@@ -77,7 +77,7 @@ namespace do_background_work_in_forms
                             // Discard/Ignore the return task in this case
                             _ = notification.ShowAsync(
                                 this,
-                                $"Performed {stopwatch.Elapsed.TotalSeconds} seconds total work.",
+                                $"Performed {(int)stopwatch.Elapsed.TotalSeconds} seconds total work.",
                                 ok: "Snooze",
                                 cancel: "Dismiss");
                         }
@@ -107,8 +107,8 @@ namespace do_background_work_in_forms
                         stopwatchTask.Stop();
                         await notification.ShowAsync(
                             this,
-                            $"Performed {stage} in {stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
-                            $"Total time is {stopwatchTotal.Elapsed.TotalSeconds} seconds",
+                            $"Performed {stage} in {(int)stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
+                            $"Total time is {(int)stopwatchTotal.Elapsed.TotalSeconds} seconds",
                             ok: "Continue",
                             cancel: "Cancel");
                         if (notification.DialogResult == DialogResult.Cancel) break;

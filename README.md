@@ -1,4 +1,4 @@
-Your question is about showing a notification form on top of parent _during_ background work (emphasis mine on _during_). That is, if you only want to do background work and pop up a modal or non-modal notification when it's done, just await the `Task` and show the notification when you get execution back. I'd like to attempt to answer the question as worded, and there's a subtle distinction to be made here. It seems to me there are at least two variations: a notification that allows the background work to keep running (Snooze/Dismiss Clock Runner example), and one that blocks the _background_ work, but not the UI (Continue/Cancel Work in Stages Example). So, one might consider implementing the notification `Form` in a manner that can optionally `await` when shown as a non-modal, and also stays on top of the parent form as per the spec. By checking the `DialogResult` after awaiting `ShowAsync()` the background task can either continue or cancel in response.
+Your question is about showing a notification form on top of parent _during_ background work (emphasis mine on _during_). That is, if you only want to do background work and pop up a modal or non-modal notification when it's done, just await the `Task` and show the notification when you get execution back. I'd like to attempt to answer the question as worded, and there's a subtle distinction to be made here. It seems to me there are at least two variations: a notification that allows the background work to keep running (Snooze/Dismiss Clock Runner example), and one that blocks the _background_ work, but _not the UI_ (Continue/Cancel Work in Stages Example). So, one might consider implementing the notification `Form` in a manner that can optionally `await` when shown as a non-modal, and also stays on top of the parent form as per the spec. By checking the `DialogResult` after awaiting `ShowAsync()` the background task can either continue or cancel in response.
 
 _The general advice being offered about marshaling onto the UI thread with `Invoke` or preferably `BeginInvoke` before interacting with the UI controls from the background thread still stands._
 
@@ -130,7 +130,7 @@ private async Task RunClockWithReminders()
                     // Discard/Ignore the return task in this case
                     _ = notification.ShowAsync(
                         this,
-                        $"Performed {stopwatch.Elapsed.TotalSeconds} seconds total work.",
+                        $"Performed {(int)stopwatch.Elapsed.TotalSeconds} seconds total work.",
                         ok: "Snooze",
                         cancel: "Dismiss");
                 }
@@ -225,8 +225,8 @@ private async Task RunBackgroundWorkInStages()
             stopwatchTask.Stop();
             await notification.ShowAsync(
                         this,
-                        $"Performed {stage} in {stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
-                        $"Total time is {stopwatchTotal.Elapsed.TotalSeconds} seconds",
+                        $"Performed {stage} in {(int)stopwatchTask.Elapsed.TotalSeconds} seconds.{Environment.NewLine}" +
+                        $"Total time is {(int)stopwatchTotal.Elapsed.TotalSeconds} seconds",
                         ok: "Continue",
                         cancel: "Cancel");
             if (notification.DialogResult == DialogResult.Cancel) break;
@@ -238,4 +238,4 @@ private async Task RunBackgroundWorkInStages()
 
 
   [1]: https://i.sstatic.net/lGUMIcu9.png
-  [2]: https://i.sstatic.net/YF7s8Xsx.png
+  [2]: https://i.sstatic.net/QsJDT1Wn.png
