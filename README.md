@@ -142,15 +142,17 @@ private async Task RunClockWithReminders()
         UpdateMainForm(enableButton: true);
     }
 }
-private void UpdateMainForm(bool enableButton, string? label = null, bool copyToTitle = true)
+private void UpdateMainForm(bool enableButton, string? label = null, string? title = "")
 {
     BeginInvoke(() =>
     {
         buttonStartWorkload.Enabled = enableButton;
-        if (label is string)
+        if (label is string) this.label.Text = label;
+        if (title is string)
         {
-            this.label.Text = label;
-            if (copyToTitle) Text = label;
+            // Specifically, on empty, copy label to Title
+            if (title == string.Empty) Text = this.label.Text;
+            else Text = title;
         }
     });
 }
