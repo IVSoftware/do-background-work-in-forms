@@ -10,6 +10,14 @@
             buttonCancel.Click += (sender, e) =>
             {
                 DialogResult = DialogResult.Cancel;
+                localSafeSignalSemaphore();
+            };
+            buttonOK.Click += (sender, e) =>
+            {
+                localSafeSignalSemaphore();
+            };
+            void localSafeSignalSemaphore()
+            {
                 Owner?.BeginInvoke(() =>
                 {
                     Hide();
@@ -20,15 +28,7 @@
                     _busy.Wait(0);   // If count is 1, decrement it...
                     _busy.Release(); // ... even if we're just going to increment it again.
                 });
-            };
-            buttonOK.Click += (sender, e) =>
-            {
-                Owner?.BeginInvoke(() =>
-                {
-                    Hide();
-                    Owner?.BringToFront();
-                });
-            };
+            }
         }
 
         SemaphoreSlim _busy = new SemaphoreSlim(1, maxCount: 1);

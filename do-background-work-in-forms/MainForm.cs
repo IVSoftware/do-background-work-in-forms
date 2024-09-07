@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 
 namespace do_background_work_in_forms
 {
@@ -20,14 +18,17 @@ namespace do_background_work_in_forms
                     .Wait(),
                     true
                  );
-#elif true
+#elif false
                 await RunClockWithReminders();
 #else
+
+                await RunBackgroundWorkInStages();
 #endif
                 buttonStartWorkload.Enabled = true;
             };
         }
-        async Task NotifyWhenComplete(Action work, bool notify)
+
+        private async Task NotifyWhenComplete(Action work, bool notify)
         {
             await Task.Run(work);
             using (var notifier = new Notification())
@@ -35,7 +36,7 @@ namespace do_background_work_in_forms
                 notifier.ShowDialog(this, "Backgound work is complete.");
             }
         }
-        async Task RunClockWithReminders()
+        private async Task RunClockWithReminders()
         {
             using (var notification = new Notification())
             {
@@ -59,14 +60,32 @@ namespace do_background_work_in_forms
                             ok: "Snooze",
                             cancel: "Dismiss");
                     }
-                    //breakFromInner:
-                    //await notification.ThreadsafeShowWithMessageAsync(
-                    //    this,
-                    //    $"Completed long-running task",
-                    //    cancel: "Done");
-                    //await Task.Delay(250); // Cosmetic
                 });
             }
+        }
+        enum Stage { Idle, Stage1, Stage2, Stage3 }
+        private async Task RunBackgroundWorkInStages()
+        {
+            using (var notification = new Notification())
+            {
+                labelClock.BeginInvoke(() => labelClock.Text = $@"{Stage.Idle}");
+                var stopwatchTotal = Stopwatch.StartNew();
+                foreach (Stage stage in Enum.GetValues<Stage>().Skip(1))
+                {
+                    var stopwatchTask = Stopwatch.StartNew();
+                    labelClock.BeginInvoke(() => labelClock.Text = $@"{stage}");
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+                    stopwatchTask.Stop();
+                    await notification.ThreadsafeShowWithMessageAsync(
+                                this,
+                                $"Performed {stage} in {stopwatchTask.Elapsed.Seconds} seconds.{Environment.NewLine}" +
+                                $"Total time is {stopwatchTotal.Elapsed.Seconds} seconds",
+                                ok: "Continue",
+                                cancel: "Cancel");
+                    if (notification.DialogResult == DialogResult.Cancel) break;
+                }
+            }
+            labelClock.BeginInvoke(() => labelClock.Text = $@"{Stage.Idle}");
         }
     }
 }
