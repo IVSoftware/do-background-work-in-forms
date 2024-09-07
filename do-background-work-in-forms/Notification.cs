@@ -84,10 +84,10 @@
         [Obsolete("Use ShowAsync with this class")]
         public new void Show(IWin32Window owner) => throw new NotImplementedException();
 
-        [Obsolete("Use ShowAsync with this class")]
+        [Obsolete("Use ShowDialog(owner, message, ok, cancel), with this class")]
         public new void ShowDialog() => throw new NotImplementedException();
 
-        [Obsolete("Use ShowAsync with this class")]
+        [Obsolete("Use ShowDialog(owner, message, ok, cancel), with this class")]
         public new void ShowDialog(IWin32Window owner) => throw new NotImplementedException();
     }
 }
