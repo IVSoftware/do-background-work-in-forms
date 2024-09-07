@@ -7,7 +7,7 @@ namespace do_background_work_in_forms
         public MainForm()
         {
             InitializeComponent();
-#if false
+#if true
             buttonStartWorkload.Click += async (sender, e) =>
                 // Simulate workload with delay
                 await NotifyWhenComplete(

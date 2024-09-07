@@ -131,7 +131,7 @@ private async Task RunClockWithReminders()
                         if (notification.DialogResult == DialogResult.Cancel) return;
                         UpdateMainForm(enableButton: false, label: $@"{DateTime.Now:hh\:mm\:ss}");
                     }
-                    // Discard/Ignore the return task in this case
+                    // Discard/Ignore the returned TaskAwaiter in this case
                     _ = notification.ShowAsync(
                         this,
                         $"Performed {(int)stopwatch.Elapsed.TotalSeconds} seconds total work.",
