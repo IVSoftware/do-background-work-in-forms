@@ -1,4 +1,4 @@
-Your question is about showing a notification form on to _during_ backgound work (emphasis mine on _during_). That is, if you only want to do background work and pop up a modal or non-modal notification when it's done, just await the `Task` and show the notification when you get execution back. I'd like to attempt to answer the question as worded, and there's a subtle distinction to be made here. It seems to me there are at least two variations: a notification that allows the background work to keep running (Snooze/Dismiss Clock Runner example), and one that blocks the _background_ work, but not the UI (Continue/Cancel Work in Stages Example. So one might consider implementing the notification `Form` in a manner that can optionally `await` when shown as a non-modal, and also stays on top of the parent form as per the spec. By checking the `DialogResult` after awaiting `ShowAsync()` the background task can either continue or cancel in response.
+Your question is about showing a notification form on to _during_ backgound work (emphasis mine on _during_). That is, if you only want to do background work and pop up a modal or non-modal notification when it's done, just await the `Task` and show the notification when you get execution back. I'd like to attempt to answer the question as worded, and there's a subtle distinction to be made here. It seems to me there are at least two variations: a notification that allows the background work to keep running (Snooze/Dismiss Clock Runner example), and one that blocks the _background_ work, but not the UI (Continue/Cancel Work in Stages Example). So, one might consider implementing the notification `Form` in a manner that can optionally `await` when shown as a non-modal, and also stays on top of the parent form as per the spec. By checking the `DialogResult` after awaiting `ShowAsync()` the background task can either continue or cancel in response.
 
 #### Custom notification form
 ```
@@ -110,6 +110,7 @@ private async Task RunClockWithReminders()
 {
     try
     {
+        UpdateMainForm(enableButton: false, label: $@"{DateTime.Now:hh\:mm\:ss}");
         using (var notification = new Notification())
         {
             await Task.Run(async () =>
