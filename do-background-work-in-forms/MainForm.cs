@@ -17,7 +17,7 @@ namespace do_background_work_in_forms
                     .Wait(),
                     true
                  );
-#elif false
+#elif true
             buttonStartWorkload.Click += async (sender, e) =>
                 await RunClockWithReminders();
 #else                

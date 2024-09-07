@@ -54,8 +54,11 @@ public partial class Notification : Form
         owner.BeginInvoke(() =>
         {
             Configure(message, ok, cancel);
-            if (!Visible) base.Show(owner);
-            CenterToParent();
+            if (!Visible)
+            {
+                base.Show(owner);
+                CenterToParent();
+            }
         });
         await _busy.WaitAsync();
     }
